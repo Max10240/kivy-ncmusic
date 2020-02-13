@@ -1,8 +1,6 @@
 #:import C kivy.utils.get_color_from_hex
-###:import SwapTransition kivy.uix.screenmanager.SwapTransition
-#:import ScrollEffect kivy.effects.scroll.ScrollEffect
-
-#:set red (96.2/100,20.9/100,20.9/100)
+#:import SwapTransition kivy.uix.screenmanager.FadeTransition
+#:set common app.theme[app.system_config['theme']]['common']
 #:set gray (.99,.99,.99)
 #:set dark_gray (.9,.9,.9)
 #:set white (1,1,1)
@@ -11,9 +9,6 @@
 
 <Widget>:
     font_name: 'kai'
-
-<S@ScrollEffect>:
-    min_overscroll: 0
     
 <WhiteGridLayout@GridLayout>:
     canvas.before:
@@ -26,7 +21,7 @@
 <RedGridLayout@GridLayout>:
     canvas.before:
         Color:
-            rgb: red
+            rgb:common
         Rectangle:
             pos: self.pos
             size: self.size
@@ -34,16 +29,19 @@
 <RedFloatLayout@FloatLayout>:
     canvas.before:
         Color:
-            rgb: red
+            rgb:common
         Rectangle:
             pos: self.pos
             size: self.size
 <ScrollView>:
     scroll_timeout: 30000
-    scroll_distance: 2
-    effect_cls: ScrollEffect
+    scroll_distance: 1
+    effect_cls: app.S
     size_hint: (1,1)
     do_scroll_x: False
+    on_scroll_start: app.touch_scrllview(args, touch_on=True)
+    on_scroll_stop: app.touch_scrllview(args, touch_on=False)
+    
     canvas.before:
         Color:
             rgb: white
@@ -84,19 +82,32 @@
 <ToolGLayout@GridLayout>:
     t0: '?'
     i0: 'src/favorite.png'
+    c0: ()
     cols: 1
     GridLayout:
         rows: 1
         LeftLabel:
-            size_hint_x: .1
-        Image:
-            source: self.parent.parent.i0
+            size_hint_x: None
+            width: root.width*.02
+
+        GridLayout:
+            cols: 1
+            size_hint_x: None
+            width: self.height
+            canvas.before:
+                Color:
+                    rgb: self.parent.parent.c0 or common
+
+                Rectangle:
+                    size: self.size
+                    pos: self.pos
+                    source: self.parent.parent.i0
 
         FixedHeightLeftLabel:
             text: self.parent.parent.t0
 
-        LeftLabel:
-            size_hint_x: 9
+##        LeftLabel:
+##            size_hint_x: 9
 
     GridLayout:
         rows: 1
@@ -112,7 +123,7 @@
 <PlaylistGlayout@GridLayout>:
     size_hint_y: None
     height: app.height*.1
-    on_touch_down: app.touch_on_layout(args)
+    on_touch_up: app.touch_on_layout(args)
     idd: 'music_list'
     rows: 1
 
@@ -150,10 +161,10 @@
 
 <PlaylistManager@GridLayout>:
     t0: 'S(0)'
-    on_touch_down: app.touch_on_layout(args)
+    on_touch_up: app.touch_on_layout(args)
     rows: 1
     size_hint_y: None
-    height: app.height*.05
+    height: app.height*.04
     
     canvas.before:
         Color:
@@ -186,11 +197,12 @@
     size_hint_y: None
     height: app.height*.08
     idd: 'song'
-    on_touch_down: app.touch_on_layout(args)
+    on_touch_up: app.touch_on_layout(args)
+    max_len: 23
     d_info: {}
     n0: '1'
-    t0: 'SunShine in the rain'
-    t1: 'Bwo-Music50'
+    t0: '还没有缓存音乐哦'
+    t1: 'Yourself'
     
     MiddleLabel:
         text: self.parent.n0
@@ -211,17 +223,17 @@
         source: 'src/point.png'
 
 
-<RecommendPlaylist@GridLayout>:
-    idd: 'music_list'
-    on_touch_down: app.touch_on_layout(args)
-    
-    s0: None
-    t0: ''
-    playlist_id: '0000'
+<RecommendPlaylist@WhiteGridLayout>:
     cols: 1
-    pl_id: None
     size_hint_y: None
     height: self.minimum_height
+    idd: 'music_list'
+    on_touch_up: app.touch_on_layout(args)
+    
+    s0: '1'
+    t0: '1'
+    playlist_id: '0000'
+    
     Image:
         size_hint_y: None
         height: app.width/3
@@ -234,8 +246,27 @@
         font_size: app.font_size*.7
         text: self.parent.t0
 
+<SideBarBox@GridLayout>:
+    idd: ''
+    i0: ''
+    t0: ''
+    on_touch_up: app.touch_on_layout(args)
+    rows: 1
+    size_hint_y: None
+    height: app.height/15
+    
+    Image:
+        size_hint_x: None
+        width: self.height
+        source: self.parent.i0
 
+    FixedHeightLeftLabel:
+        size_hint_x: None
+        width: self.font_size*len(self.text)
+        text: self.parent.t0
+        
 ScreenManager:
+    transition: SwapTransition(duration=.1)
     Screen:
         name: 'home'
 
@@ -244,44 +275,44 @@ ScreenManager:
             RedGridLayout:
                 cols: 1
                 size_hint_y: .4
-                id: red_box
+                id:common_box
                 
                 RedGridLayout:
                     cols: 1
-                    size_hint_y: .3
+                    size_hint_y: .3 if not app.is_android else 0
                     
                 RedGridLayout:
                     rows: 1
-                    id: red_0
+                    id:common_0
                     size_hint_y: 1.5
                     Image:
                         source: 'src/menu.png'
                         idd: 'menu'
-                        on_touch_down: app.touch_on_layout(args)
+                        on_touch_up: app.touch_on_layout(args)
                         
                     Label:
                         
                     Image:
                         source: 'src/music.png'
                         idd: 'music'
-                        on_touch_down: app.touch_on_layout(args)
+                        on_touch_up: app.touch_on_layout(args)
                         
                     Image:
                         source: 'src/wyy.png'
                         idd: 'wyy'
-                        on_touch_down: app.touch_on_layout(args)
+                        on_touch_up: app.touch_on_layout(args)
                         
                     Image:
                         source: 'src/video.png'
                         idd: 'video'
-                        on_touch_down: app.touch_on_layout(args)
+                        on_touch_up: app.touch_on_layout(args)
 
                     Label:
                     
                     Image:
                         idd: 'search'
                         source: 'src/search.png'
-                        on_touch_down: app.touch_on_layout(args)
+                        on_touch_up: app.touch_on_layout(args)
 
             GridLayout:
                 size_hint_y:5
@@ -315,13 +346,15 @@ ScreenManager:
 
                             
                             GridLayout:
+                                id: user_info_box
                                 rows: 1
                                 size_hint: 1,None
                                 height: root.height*.10
+                                c0: ()
                                 
                                 canvas.before:
                                     Color:
-                                        rgb: red
+                                        rgb: self.c0 or common
                                     Rectangle:
                                         size: self.width,self.height*.5
                                         pos: self.pos[0], self.center[1] 
@@ -329,50 +362,59 @@ ScreenManager:
                                     Color:
                                         rgb: gray
                                     RoundedRectangle:
+                                        radius: [self.height*.2]
                                         size: self.size[0]*.98,self.size[1]*.95
                                         pos: self.width*.01,self.pos[1]+self.height*.025
 
                                     Color:
                                         rgb: dark_gray
-                                    RoundedRectangle:
+                                    Rectangle:
                                         size: self.size[0]*.98,self.size[1]*.05
                                         pos: self.width*.01,self.pos[1]+self.height*.025
 
-                                LeftLabel:
-                                    size_hint_x: .5
+                                Label:
+                                    size_hint_x: None
+                                    width: root.width*.03
                                     
                                 GridLayout:
                                     id: avatar_image_1
                                     rows: 1
-                                    size_hint_y: 2
+                                    size_hint_x: None
+                                    width: self.height
                                     canvas.before:
                                         Ellipse:
                                             source: app.avatar_fn
                                             size: self.height*.90,self.height*.90
                                             pos: self.pos[0], self.pos[1]+root.height*.005
 
-                                GridLayout:
-                                    rows: 1
+                                Label:
+                                    size_hint_x: None
+                                    width: root.width*.07
                                     
                                 FixedHeightLeftLabel:
                                     id: avatar_text_1
                                     text: app.nickname
                                     
 
-                                LeftLabel:
-                                    size_hint_x: 7
+                                Label:
 
                                 GridLayout:
                                     cols: 1
+                                    id: vip_round
+                                    c0: ()
+                                    size_hint_x: None
+                                    width: app.font_size*5
+                                    
                                     canvas.before:
                                         Color:
-                                            rgb: red
+                                            rgb: self.c0 or common
                                         Line:
                                             width: 1.01
                                             rounded_rectangle: (self.center[0]-app.font_size*2.5,self.center[1]-app.font_size*.6,app.font_size*5,app.font_size*1.2,app.font_size*.6,app.font_size*.6,app.font_size*.6,app.font_size*.6,100)
                                         
                                     Label:
-                                        color: C('#101010')
+                                        id: vip
+                                        color: common+(1,)
                                         font_size: app.font_size
                                         size_hint: (1, None)
                                         height: self.parent.height
@@ -380,16 +422,18 @@ ScreenManager:
                                         valign: 'top'
                                         text: '开通会员'
 
-                                MiddleLabel:
+                                Label:
+                                    size_hint_x: .03
                                     
                             GridLayout:
+                                id: func_box
                                 cols: 1
                                 size_hint_y: None
                                 height: root.height*.4
                                 
                                 ToolGLayout:
                                     idd: 'local_music'
-                                    on_touch_down: app.touch_on_layout(args)
+                                    on_touch_up: app.touch_on_layout(args)
                                     i0: 'src/local_music.png'
                                     t0: '本地音乐'
 
@@ -412,7 +456,7 @@ ScreenManager:
                                 ToolGLayout:
                                     i0: 'src/sati.png'
                                     t0: 'Sati空间'
-                                   
+
                             PlaylistManager:
                                 id: created_m_l_m
                                 idd: 'created_m_l_m'
@@ -455,20 +499,20 @@ ScreenManager:
                                 text: '推荐'
                                 id: recommand
                                 idd: 'recommand'
-                                on_touch_down: app.touch_on_layout(args)
+                                on_touch_up: app.touch_on_layout(args)
 
                             Label:
                                 text: '朋友'
                                 id: friend
                                 idd: 'friend'
-                                on_touch_down: app.touch_on_layout(args)
+                                on_touch_up: app.touch_on_layout(args)
                                 
 
                             Label:
                                 text: '电台'
                                 id: radio
                                 idd: 'radio'
-                                on_touch_down: app.touch_on_layout(args)
+                                on_touch_up: app.touch_on_layout(args)
                             
                         RedFloatLayout:
                             size_hint: None,None
@@ -505,12 +549,13 @@ ScreenManager:
                                     GridLayout:
                                         cols: 1
                                         size_hint: 1,None
+                                        c0: ()
                                         height: root.width*.33
                                         id: space_red
                                         
                                         canvas.before:
                                             Color:
-                                                rgb: red
+                                                rgb: self.c0 or common
                                             Rectangle:
                                                 size: self.width,self.height*.7
                                                 pos: self.pos[0], self.pos[1]+self.height*.3
@@ -519,19 +564,14 @@ ScreenManager:
                                             size_hint_y: .05
                                             
                                         GridLayout:
+                                            id: img_show
                                             rows: 1
-                                            LeftLabel:
-                                                
-                                            Image:
-                                                id: poster
-                                                size_hint_x: 100
-                                                source: 'src/preflash.jpg'
-                                                keep_ratio: False
-                                                allow_stretch: True
-
-                                            LeftLabel:
-                                        
-                                        
+                                            scaling_ratio: .95
+                                            canvas.before:
+                                                RoundedRectangle:
+                                                    size: self.size[0]*self.scaling_ratio, self.size[1]*self.scaling_ratio
+                                                    pos: self.pos[0]+self.width*(1-self.scaling_ratio)/2, self.pos[1]+self.height*(1-self.scaling_ratio)/2
+                                                    source: 'src/preflash.jpg'
 
                                     Label:
                                         size_hint_y: None
@@ -542,9 +582,10 @@ ScreenManager:
                                         size_hint_y: None
                                         height: root.height*.1
                                         id: box_pic_fm
-                                        canvas:
+                                        c0: common
+                                        canvas.before:
                                             Color:
-                                                rgb: red
+                                                rgb: self.c0 or common
                                                 
                                             Ellipse:
                                                 pos: self.pos[0]+self.width/8-self.height*.8/2, self.pos[1]
@@ -632,26 +673,11 @@ ScreenManager:
                                             pos_hint: {'center_x':.5, 'center_y': .3}
                                             text: '推荐歌单 >'
                                             
-                                        LeftLabel:
+                                        Label:
 
-                                        LeftLabel:
-                                    
-                                        RecommendPlaylist:
-                                            s0: 'src/logo.jpg'
-                                            t0: '你的宝贝蔡徐坤的专辑'
+                                        Label:
 
                                         RecommendPlaylist:
-                                            s0: 'src/logo.jpg'
-                                            t0: '你的宝贝蔡徐坤的专辑'
-
-                                        RecommendPlaylist:
-                                            s0: 'src/logo.jpg'
-                                            t0: '你的宝贝蔡徐坤的专辑'
-
-                                        RecommendPlaylist:
-                                            pl_id: '123'
-                                            s0: 'src/logo.jpg'
-                                            t0: '你的宝贝蔡徐坤的专辑'
 
                             ScrollView:
                                 id: second_page_2_s
@@ -725,6 +751,9 @@ ScreenManager:
                                 ScrollView:
                                     id: sidebar_s
                                     size_hint_y: 10
+                                    on_scroll_start: None
+                                    on_scroll_stop: None
+                                    
                                     GridLayout:
                                         cols: 1
                                         size_hint_y: None
@@ -758,7 +787,9 @@ ScreenManager:
                                                 rows: 1
 
                                                 Label:
-                                                    size_hint_x: .2
+                                                    size_hint_x: None
+                                                    width: root.height*.03
+                                                    
                                                 Label:
                                                     id: avatar_text_0
                                                     color: C('#ffffff')
@@ -767,8 +798,14 @@ ScreenManager:
                                                     size_hint_x: None
                                                     width: self.texture_size[0]
 
+                                                Label:
+                                                    size_hint_x: None
+                                                    width: root.height*.02
+                                                    
                                                 GridLayout:
                                                     rows: 1
+                                                    size_hint_x: None
+                                                    width: self.minimum_width
                                                     canvas:
                                                         Color:
                                                             rgb: white
@@ -777,21 +814,21 @@ ScreenManager:
                                                             rounded_rectangle: (self.center[0]-app.font_size*1.5*.6,self.center[1]-app.font_size*.6*.6,app.font_size*3*.6,app.font_size*1.2*.6,app.font_size*.36,app.font_size*.36,app.font_size*.36,app.font_size*.36,30)
 
                                                         
-                                                    MiddleLabel:
+                                                    Label:
                                                         color: C('#ffffff')
                                                         font_size: app.font_size*.6
-                                                        size_hint: (1, None)
-                                                        height: self.parent.height
-                                                        halign: 'center'
-                                                        valign: 'top'
+                                                        size_hint_x: None
+                                                        width: self.texture_size[0]
                                                         text: 'Lv.5'
 
                                                 Label:
-                                                    size_hint_x: 6
                                                     
                                                 GridLayout:
                                                     idd: 'check_in'
-                                                    on_touch_down: app.touch_on_layout(args)
+                                                    on_touch_up: app.touch_on_layout(args)
+                                                    size_hint_x: None
+                                                    width: self.minimum_width
+                                                    
                                                     rows: 1
                                                     canvas:
                                                         Color:
@@ -802,67 +839,56 @@ ScreenManager:
                                                     Label:
                                                         color: C('#ffffff')
                                                         font_size: app.font_size
-                                                        size_hint: (1, None)
-                                                        height: self.parent.height
-                                                        halign: 'center'
-                                                        valign: 'top'
+                                                        size_hint_x: None
+                                                        width: self.texture_size[0]
                                                         text: '签到'
                                                         
-                                                GridLayout:
-                                                    size_hint_x: .2
-                                                    cols: 1
+                                                Label:
+                                                    size_hint_x: None
+                                                    width: root.height*.03
 
                                         GridLayout:
                                             cols: 1
                                             size_hint_y: None
-                                            height: root.height/3
+                                            height: self.minimum_height
 
-                                            GridLayout:
+                                            SideBarBox:
                                                 idd: 'message'
-                                                on_touch_down: app.touch_on_layout(args)
-                                                rows: 1
-                                                Image:
-                                                    source: 'src/message.png'
-                                                FixedHeightLeftLabel:
-                                                    text: '我的消息'
-                                                    
-                                                Label:
-                                                    size_hint_x: 15
+                                                i0: 'src/message.png'
+                                                t0: '我的消息'
 
-                                            GridLayout:
+                                            SideBarBox:
                                                 idd: 'vip'
-                                                on_touch_down: app.touch_on_layout(args)
-                                                rows: 1
-                                                Image:
-                                                    source: 'src/vip.png'
-                                                FixedHeightLeftLabel:
-                                                    text: '会员中心'
-                                                Label:
-                                                    size_hint_x: 15
+                                                i0: 'src/vip.png'
+                                                t0: '会员中心'
 
-                                            GridLayout:
+                                            SideBarBox:
                                                 idd: 'ticket'
-                                                on_touch_down: app.touch_on_layout(args)
-                                                rows: 1
-                                                Image:
-                                                    source: 'src/ticket.png'
-                                                FixedHeightLeftLabel:
-                                                    text: '云村有票'
-                                                Label:
-                                                    size_hint_x: 15
+                                                i0: 'src/ticket.png'
+                                                t0: '云村有票'
 
-                                            GridLayout:
+                                            SideBarBox:
                                                 idd: 'shop'
-                                                on_touch_down: app.touch_on_layout(args)
-                                                rows: 1
-                                                Image:
-                                                    source: 'src/shop.png'
-                                                FixedHeightLeftLabel:
-                                                    text: '商城'
-                                                Label:
-                                                    size_hint_x: 15
-                                                    
-                                            
+                                                i0: 'src/shop.png'
+                                                t0: '商城'
+                                                
+                                            GridLayout:
+                                                size_hint_y:None
+                                                height: root.height/50
+                                                
+                                                canvas.before:
+                                                    Color:
+                                                        rgb: dark_gray
+                                                        
+                                                    Rectangle:
+                                                        pos: self.pos
+                                                        size: self.size
+
+                                            SideBarBox:
+                                                idd: 'theme'
+                                                i0: 'src/theme.png'
+                                                t0: '个性换肤'
+
                                         LeftLabel:
                                             id: sidebar_left_label
                                             text: ''
@@ -872,22 +898,22 @@ ScreenManager:
 
                                     Label:
                                         size_hint_x: None
-                                        width: root.width*.03
+                                        width: min(root.width*.03,self.parent.width)
                                         
                                     GridLayout:
                                         idd: 'night'
                                         size_hint_x: None
                                         width: self.minimum_width
-                                        on_touch_down: app.touch_on_layout(args)
+                                        on_touch_up: app.touch_on_layout(args)
                                         rows: 1
                                         Image:
                                             size_hint_x: None
-                                            width: self.height
+                                            width: min(self.height,self.parent.parent.width)
                                             source: 'src/night.png'
                                             
                                         FixedHeightLeftLabel:
                                             text: '夜间模式'
-                                            font_size: app.font_size if self.width else 0
+                                            font_size: app.font_size if self.parent.parent.width else 0
                                             
 
                                     Label:
@@ -896,16 +922,16 @@ ScreenManager:
                                         idd: 'setting'
                                         size_hint_x: None
                                         width: self.minimum_width
-                                        on_touch_down: app.touch_on_layout(args)
+                                        on_touch_up: app.touch_on_layout(args)
                                         rows: 1
                                         Image:
                                             size_hint_x: None
-                                            width: self.height
+                                            width: min(self.height,self.parent.parent.width)
                                             source: 'src/setting.png'
                                             
                                         FixedHeightLeftLabel:
                                             text: '设置'
-                                            font_size: app.font_size if self.width else 0
+                                            font_size: app.font_size if self.parent.parent.width else 0
 
                                     Label:
                                         
@@ -913,27 +939,27 @@ ScreenManager:
                                         idd: 'exit'
                                         size_hint_x: None
                                         width: self.minimum_width
-                                        on_touch_down: app.touch_on_layout(args)
+                                        on_touch_up: app.touch_on_layout(args)
                                         rows: 1
                                         Image:
                                             size_hint_x: None
-                                            width: self.height
+                                            width: min(self.height,self.parent.parent.width)
                                             source: 'src/exit.png'
                                             
                                         FixedHeightLeftLabel:
                                             text: '退出'
-                                            font_size: app.font_size if self.width else 0
+                                            font_size: app.font_size if self.parent.parent.width else 0
 
                                     Label:
                                         size_hint_x: None
-                                        width: root.width*.03
+                                        width: min(root.width*.03,self.parent.width)
                                             
                             GridLayout:
                                 id: shadow
                                 cols: 1
                                 opacity: .4
                                 idd: 'menu'
-                                on_touch_down:app.touch_on_layout(args)
+                                on_touch_up:app.touch_on_layout(args)
                                 
                                 canvas.before:
                                     Color:
@@ -945,17 +971,16 @@ ScreenManager:
             WhiteGridLayout:
                 id: playbar
                 cols: 1
-                size_hint: None,None
-                width: root.width
+                size_hint: 1,None
                 height: 0
-                pos: [0,0]
 
                 Label:
                     size_hint_y: .1
                     
                 GridLayout:
                     rows: 1
-                    
+                    idd: 'song_detail'
+                    on_touch_up: app.touch_on_layout(args)
                     Label:
                         size_hint_x: None
                         width: self.height*.1
@@ -993,7 +1018,7 @@ ScreenManager:
                         Image:
                             id: playbar_status
                             idd: 'play_or_stop'
-                            on_touch_down: app.touch_on_layout(args)
+                            on_touch_up: app.touch_on_layout(args)
                             size_hint_x: None
                             width: self.height*.7
                             source: 'src/pausing.png'
@@ -1003,8 +1028,9 @@ ScreenManager:
                             width: self.height*.7
                             
                         Image:
-                            idd: 'play_list'
-                            on_touch_down: app.touch_on_layout(args)
+                            id: loop_stt
+                            idd: 'change_loop_status'
+                            on_touch_up: app.touch_on_layout(args)
                             size_hint_x: None
                             width: self.height*.4
                             source: 'src/play_list.png'
@@ -1023,7 +1049,7 @@ ScreenManager:
                 height: root.width*.1
                 Image:
                     idd: 'back'
-                    on_touch_down: app.touch_on_layout(args)
+                    on_touch_up: app.touch_on_layout(args)
                     size_hint_x: None
                     height: self.width
                     source: 'src/white_arrow_left.png'
@@ -1042,7 +1068,7 @@ ScreenManager:
 
                     Image:
                         idd: 'search_music'
-                        on_touch_down: app.touch_on_layout(args)
+                        on_touch_up: app.touch_on_layout(args)
                         size_hint_x: None
                         height: self.width
                         source: 'src/search.png'
@@ -1072,6 +1098,7 @@ ScreenManager:
                     text: '专辑'
 
             ScrollView:
+                id: search_m_l_sv
                 size_hint_y: 1
                 GridLayout:
                     cols: 1
@@ -1092,7 +1119,9 @@ ScreenManager:
                         GridLayout:
                             rows: 1
                             Image:
-                                source: 'src/avatar.jpg'
+                                idd: 'play_all_search_songs'
+                                on_touch_up: app.touch_on_layout(args)
+                                source: 'src/pausing.png'
                                 size_hint_x: None
                                 width: self.height
 
@@ -1153,111 +1182,223 @@ ScreenManager:
         name: 'music_list'
         GridLayout:
             cols: 1
-            ScrollView:
-                GridLayout:
+            
+            GridLayout:
+                size_hint_y: None
+                height: root.height*.3
+                canvas.before:
+                    Color:
+                        rgb: dark_gray
+                    Rectangle:
+                        pos: self.pos
+                        size: self.size
                     
+                cols: 1
+                GridLayout:
+                    rows: 1
+                    GridLayout:
+                        rows: 1
+                        Image:
+                            idd: 'back'
+                            on_touch_up: app.touch_on_layout(args)
+                            
+                            source: 'src/arrow_left.png'
+                            
+                        FixedHeightLeftLabel:
+                            text: '歌单'
+
+                    Label:
+                        size_hint_x: 3
+
+                    GridLayout:
+                        rows: 1
+                        Image:
+                            source: 'src/search.png'
+
+                        Image:
+                            source: 'src/point.png'
+
+                GridLayout:
+                    rows: 1
+                    size_hint_y: 2
+                    Image:
+                        id: big_pl_cover
+                        source: 'src/avatar.jpg'
+
+                    GridLayout:
+                        cols: 1
+                        
+                        FixedHeightLeftLabel:
+                            id: pl_name
+                            text: '我喜欢的音乐'
+
+                        GridLayout:
+                            rows: 1
+                            Image:
+                                id: creator_avatar
+                                size_hint_x: None
+                                width: self.height
+                                source: 'src/avatar.jpg'
+
+                            FixedHeightLeftLabel:
+                                id: creator_name
+                                text: app.nickname
+
+                    Label:
+                            
+                GridLayout:
+                    rows: 1
+                    Image:
+                        source: 'src/comment.png'
+
+                    Image:
+                        source: 'src/share.png'
+
+                    Image:
+                        source: 'src/white_download.png'
+
+                    Image:
+                        source: 'src/muti_choice.png'
+                
+                        
+            WhiteGridLayout:
+                rows: 1
+                size_hint_y: None
+                height: root.height*.05
+
+                Image:
+                    size_hint_x: None
+                    width: self.height
+                    source: 'src/avatar.jpg'
+                    
+                FixedHeightLeftLabel:
+                    text: '播放全部'
+
+            ScrollView:
+                id: m_l_sv
+                GridLayout:
+                    id: playlist_songs
                     cols: 1
                     size_hint_y: None
                     height: self.minimum_height
-
-                    GridLayout:
-                        size_hint_y: None
-                        height: root.height*.4
-                            
-                        cols: 1
-                        GridLayout:
-                            rows: 1
-                            GridLayout:
-                                rows: 1
-                                Image:
-                                    idd: 'back'
-                                    on_touch_down: app.touch_on_layout(args)
-                                    
-                                    source: 'src/arrow_left.png'
-                                    
-                                FixedHeightLeftLabel:
-                                    text: '歌单'
-
-                            Label:
-                                size_hint_x: 3
-
-                            GridLayout:
-                                rows: 1
-                                Image:
-                                    source: 'src/avatar.jpg'
-
-                                Image:
-                                    source: 'src/point.png'
-
-                        GridLayout:
-                            rows: 1
-                            size_hint_y: 2
-                            Image:
-                                id: big_pl_cover
-                                source: 'src/avatar.jpg'
-
-                            GridLayout:
-                                cols: 1
-                                
-                                FixedHeightLeftLabel:
-                                    id: pl_name
-                                    text: '我喜欢的音乐'
-
-                                GridLayout:
-                                    rows: 1
-                                    Image:
-                                        id: creator_avatar
-                                        size_hint_x: None
-                                        width: self.height
-                                        source: 'src/avatar.jpg'
-
-                                    FixedHeightLeftLabel:
-                                        id: creator_name
-                                        text: app.nickname
-
-                            Label:
-                                    
-                        GridLayout:
-                            rows: 1
-                            Image:
-                                source: 'src/avatar.jpg'
-
-                            Image:
-                                source: 'src/avatar.jpg'
-
-                            Image:
-                                source: 'src/avatar.jpg'
-
-                            Image:
-                                source: 'src/avatar.jpg'
-                        
-                                
-                    GridLayout:
-                        rows: 1
-                        size_hint_y: None
-                        height: root.height*.05
-
-                        Image:
-                            size_hint_x: None
-                            width: self.height
-                            source: 'src/avatar.jpg'
-                            
-                        FixedHeightLeftLabel:
-                            text: '播放全部'
-
-                    GridLayout:
-                        id: playlist_songs
-                        cols: 1
-                        size_hint_y: None
-                        height: self.minimum_height
-                        
-                        SingleMusicGlayout:
+                    
+                    SingleMusicGlayout:
 
     Screen:
-        name: 'test'
-        size_hint_x: None
-        width: root.width*.7
-        opacity: .5
-        Button:
-            text: 't'
+        name: 'song_lyric'
+        GridLayout:
+            cols: 1
+            canvas.before:
+                Color:
+                    rgb: dark_gray
+                    
+                Rectangle:
+                    size: self.size
+                    pos: self.pos
+
+            GridLayout:
+                rows: 1
+                size_hint_y: None
+                height: root.height*.1
+                
+                Image:
+                    size_hint_x: None
+                    width: self.height
+                    source: 'src/arrow_left.png'
+
+                GridLayout:
+                    cols: 1
+                    FixedHeightLeftLabel:
+                        size_hint_y: 1.5
+                        text: 'SongName'
+                    FixedHeightLeftLabel:
+                        text: 'AuthorName'
+
+            ScrollView:
+                GridLayout:
+                    cols: 1
+                    size_hint_y: None
+                    height: self.minimum_height
+                    Label:
+                        id: lyric_label
+                        size_hint_y: None
+                        font_size: app.font_size
+                        color: common+(.8,)
+                        size_hint_y: None
+                        height: self.texture_size[1]
+                        
+                        text: '正在加载...'
+
+            GridLayout:
+                rows: 1
+                size_hint_y: None
+                height: app.font_size*.6
+
+                Label:
+                    size_hint_x: None
+                    width: root.width*.1
+                    text: 'CurrentTime'
+
+                GridLayout:
+                    rows: 1
+                    canvas.before:
+                        Color:
+                            rgb: white
+                        Line:
+                            points: [self.pos[0], self.pos[1]+self.height*.5, self.pos[0]+self.width, self.pos[1]+self.height*.5]
+                        
+                Label:
+                    size_hint_x: None
+                    width: root.width*.1
+                    text: 'CurrentTime'
+
+            GridLayout:
+                rows: 1
+                size_hint_y: None
+                height: root.height*.15
+
+                Label:
+                    size_hint_x: None
+                    width: root.width*.1
+                Image:
+                    size_hint_x: None
+                    width: self.height*.5
+                    source: 'src/avatar.jpg'
+                        
+                GridLayout:
+                    rows: 1
+                    Image:
+                        size_hint_y: None
+                        height: self.parent.height*.5
+                        center_y: self.parent.center_y
+                        source: 'src/avatar.jpg'
+                    Image:
+                        source: 'src/avatar.jpg'
+                    Image:
+                        size_hint_y: None
+                        height: self.parent.height*.5
+                        center_y: self.parent.center_y
+                        source: 'src/avatar.jpg'
+
+                Image:
+                    size_hint_x: None
+                    width: self.height*.5
+                    source: 'src/avatar.jpg'
+                Label:
+                    size_hint_x: None
+                    width: root.width*.1
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
