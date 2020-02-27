@@ -7,7 +7,7 @@ title = 网易云音乐
 package.name = netease
 
 # (str) Package domain (needed for android/ios packaging)
-package.domain = org.test
+package.domain = baidu.com
 
 # (str) Source code where the main.py live
 source.dir = .
@@ -22,7 +22,7 @@ source.include_patterns = src/*, NEMbox/*
 source.exclude_exts = spec
 
 # (list) List of directory to exclude (let empty to not exclude anything)
-source.exclude_dirs = test,bin
+source.exclude_dirs = test,bin,img
 
 # (list) List of exclusions using pattern matching
 source.exclude_patterns = src/hand_write.ttf
@@ -47,11 +47,13 @@ requirements = python3,kivy,requests,lxml,pycryptodome,Pyjnius
 # (list) Garden requirements
 #garden_requirements =
 
-# (str) Presplash of the application
 presplash.filename = src/preflash.png
-
-# (str) Icon of the application
-icon.filename = src/icon.png
+#presplash.filename = src/login_logo.png
+#icon.filename = src/icon.png
+icon.filename = src/login_logo.png
+android.presplash_color = #bf3a2f
+#android.presplash_color = #ffffff
+#services = NAME:ENTRYPOINT_TO_PY,NAME2:ENTRYPOINT2_TO_PY
 
 #
 # OSX Specific
@@ -78,12 +80,12 @@ fullscreen = 0
 # red, blue, green, black, white, gray, cyan, magenta, yellow, lightgray,
 # darkgray, grey, lightgrey, darkgrey, aqua, fuchsia, lime, maroon, navy,
 # olive, purple, silver, teal.
-android.presplash_color = #bf3a2f
+
 
 # (list) Permissions
 #android.permissions = RECORD_AUDIO
 
-android.permissions = INTERNET,ACCESS_FINE_LOCATION,RECORD_AUDIO
+android.permissions = INTERNET
 
 # (list) Permissions
 #android.permissions = INTERNET
@@ -276,7 +278,7 @@ ios.ios_deploy_branch = 1.7.0
 [buildozer]
 
 # (int) Log level (0 = error only, 1 = info, 2 = debug (with command output))
-log_level = 0
+log_level = 2
 
 # (int) Display warning if buildozer is run as root (0 = False, 1 = True)
 warn_on_root = 0
