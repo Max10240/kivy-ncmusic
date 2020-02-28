@@ -1,5 +1,5 @@
 # NCMusic
-![](src/login_logo.png)
+![logo](src/login_logo.png?raw=true)
 
 ** Cross-platform music player for mobile, developed using Python **
 
@@ -41,26 +41,31 @@ Interface that has not started or developed very little:
 ## Approximate interface display:
 ### pc 端:
 
-- Login:![Login](img/login_0.png)
-![login](img/login_1.png)
-- Main interface:![Main](img/main_0.png)
-- Sidebar:![Sidebar](img/sidebar_0.png)
-- Recommended playlist:![Rec_musiclist](img/rec_musiclist.png)
-![rec_musiclist](img/rec_musiclist_1.png)
-- Song detail page:![Music_detail](img/music_detail.png)
-![music_detail](img/music_detail_1.png)
-- Playlist detail page:![Musiclist_detail](img/music_list.png)
-- Search interface:![Search](img/search.png)
-- Night mode:![Night](img/night_rec_musiclist.png)
-![night](img/night_main.png)
+- Login:![Login](img/login_0.png?raw=true)
+![login](img/login_1.png?raw=true)
+- Main interface:![Main](img/main_0.png?raw=true)
+- Sidebar:![Sidebar](img/main_0.png?raw=true)
+- Recommended playlist:![Rec_musiclist](img/rec_musiclist.png?raw=true)
+![rec_musiclist](img/rec_musiclist_1.png?raw=true)
+- Song detail page:![Music_detail](img/music_detail.png?raw=true)
+![music_detail](img/music_detail_1.png?raw=true)
+- Playlist detail page:![Musiclist_detail](img/music_list.png?raw=true)
+- Search interface:![Search](img/search.png?raw=true)
+- Night mode:![Night](img/night_rec_musiclist.png?raw=true)
+![night](img/night_main.png?raw=true)
 
 ### Android side:
-- Login:![Login](img/a_login.png)
-- Main interface:![Main](img/a_main.png)
-- Sidebar:![Sidebar](img/a_side.png)
-- Recommended playlist:![Rec_musiclist](img/a_rec_m_l.png)
-- Song detail page:![Music_detail](img/a_music_detail.png)
-- Playlist detail page:![Musiclist_detail](img/a_musiclist_detail.png)
-- Search interface:![Search](img/a_search.png)
+- Login:![Login](img/a_login_0.png?raw=true)
+![login](img/login_1.png?raw=true)
+- Main interface:![Main](img/main_0.png?raw=true)
+- Sidebar:![Sidebar](img/main_0.png?raw=true)
+- Recommended playlist:![Rec_musiclist](img/rec_musiclist.png?raw=true)
+![rec_musiclist](img/rec_musiclist_1.png?raw=true)
+- Song detail page:![Music_detail](img/music_detail.png?raw=true)
+![music_detail](img/music_detail_1.png?raw=true)
+- Playlist detail page:![Musiclist_detail](img/music_list.png?raw=true)
+- Search interface:![Search](img/search.png?raw=true)
+- Night mode:![Night](img/night_rec_musiclist.png?raw=true)
+![night](img/night_main.png?raw=true)
 ## Open source license:
 - This project is released under the Apache-2.0 agreement, please refer to the license file
