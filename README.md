@@ -1,5 +1,5 @@
 # NCMusic
-![Markdown](src/login_logo.png"logo")
+![](src/login_logo.png)
 
 ** Cross-platform music player for mobile, developed using Python **
 
@@ -41,20 +41,26 @@ Interface that has not started or developed very little:
 ## Approximate interface display:
 ### pc 端:
 
-- Login:![Login](img/login_0.png"login")
-![login](img/login_1.png"login")
-- Main interface:![Main](img/main_0.png"main")
-- Sidebar:![Sidebar](img/main_0.png"siderbar")
-- Recommended playlist:![Rec_musiclist](img/rec_musiclist.png"recmmend_musiclist")
-![rec_musiclist](img/rec_musiclist_1.png"recmmend_musiclist")
-- Song detail page:![Music_detail](img/music_detail.png"music_detail")
-![music_detail](img/music_detail_1.png"music_detail")
-- Playlist detail page:![Musiclist_detail](img/music_list.png"musiclist_detail")
-- Search interface:![Search](img/search.png"search")
-- Night mode:![Night](img/night_rec_musiclist.png"night_rec_musiclist")
-![night](img/night_main.png"night_main")
+- Login:![Login](img/login_0.png)
+![login](img/login_1.png)
+- Main interface:![Main](img/main_0.png)
+- Sidebar:![Sidebar](img/sidebar_0.png)
+- Recommended playlist:![Rec_musiclist](img/rec_musiclist.png)
+![rec_musiclist](img/rec_musiclist_1.png)
+- Song detail page:![Music_detail](img/music_detail.png)
+![music_detail](img/music_detail_1.png)
+- Playlist detail page:![Musiclist_detail](img/music_list.png)
+- Search interface:![Search](img/search.png)
+- Night mode:![Night](img/night_rec_musiclist.png)
+![night](img/night_main.png)
 
 ### Android side:
-Update diagram later
+- Login:![Login](img/a_login.png)
+- Main interface:![Main](img/a_main.png)
+- Sidebar:![Sidebar](img/a_side.png)
+- Recommended playlist:![Rec_musiclist](img/a_rec_m_l.png)
+- Song detail page:![Music_detail](img/a_music_detail.png)
+- Playlist detail page:![Musiclist_detail](img/a_musiclist_detail.png)
+- Search interface:![Search](img/a_search.png)
 ## Open source license:
 - This project is released under the Apache-2.0 agreement, please refer to the license file
