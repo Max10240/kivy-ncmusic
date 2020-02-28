@@ -1,5 +1,5 @@
 # NCMusic
-<img src="src/login_logo.png" height="5%" />
+<img src="src/login_logo.png" style="zoom:50%" />
 
 ** Cross-platform music player for mobile, developed using Python **
 
@@ -41,26 +41,26 @@ Interface that has not started or developed very little:
 ## Approximate interface display:
 ### pc 端:
 
-- Login:<img src="img/login_0.png" height="5%" />
-<img src="img/login_1.png" height="5%" />
-- Main interface:<img src="img/main_0.png" height="5%" />
-- Sidebar:<img src="img/sidebar_0.png" height="5%" />
-- Recommended playlist:<img src="img/rec_musiclist.png" height="5%" />
-<img src="img/rec_musiclist_1.png" height="5%" />
-- Song detail page:<img src="img/music_detail.png" height="5%" />
-<img src="img/music_detail_1.png" height="5%" />
-- Playlist detail page:<img src="img/music_list.png" height="5%" />
-- Search interface:<img src="img/search.png" height="5%" />
-- Night mode:<img src="img/night_rec_musiclist.png" height="5%" />
-<img src="img/night_main.png" height="5%" />
+- Login:<img src="img/login_0.png" style="zoom:50%" />
+<img src="img/login_1.png" style="zoom:50%" />
+- Main interface:<img src="img/main_0.png" style="zoom:50%" />
+- Sidebar:<img src="img/sidebar_0.png" style="zoom:50%" />
+- Recommended playlist:<img src="img/rec_musiclist.png" style="zoom:50%" />
+<img src="img/rec_musiclist_1.png" style="zoom:50%" />
+- Song detail page:<img src="img/music_detail.png" style="zoom:50%" />
+<img src="img/music_detail_1.png" style="zoom:50%" />
+- Playlist detail page:<img src="img/music_list.png" style="zoom:50%" />
+- Search interface:<img src="img/search.png" style="zoom:50%" />
+- Night mode:<img src="img/night_rec_musiclist.png" style="zoom:50%" />
+<img src="img/night_main.png" style="zoom:50%" />
 
 ### Android side:
-- Login:<img src="img/a_login.png" height="5%" />
-- Main interface:<img src="img/a_main.png" height="5%" />
-- Sidebar:<img src="img/a_side.png" height="5%" />
-- Recommended playlist:<img src="img/a_rec_m_l.png" height="5%" />
-- Song detail page:<img src="img/a_music_detail.png" height="5%" />
-- Playlist detail page:<img src="img/a_musiclist_detail.png" height="5%" />
-- Search interface:<img src="img/a_search.png" height="5%" />
+- Login:<img src="img/a_login.png" style="zoom:50%" />
+- Main interface:<img src="img/a_main.png" style="zoom:50%" />
+- Sidebar:<img src="img/a_side.png" style="zoom:50%" />
+- Recommended playlist:<img src="img/a_rec_m_l.png" style="zoom:50%" />
+- Song detail page:<img src="img/a_music_detail.png" style="zoom:50%" />
+- Playlist detail page:<img src="img/a_musiclist_detail.png" style="zoom:50%" />
+- Search interface:<img src="img/a_search.png" style="zoom:50%" />
 ## Open source license:
 - This project is released under the Apache-2.0 agreement, please refer to the license file
