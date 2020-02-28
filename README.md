@@ -1,5 +1,5 @@
 # NCMusic
-![](src/login_logo.png?raw=true)
+<img src="src/login_logo.png" height="5%" />
 
 ** Cross-platform music player for mobile, developed using Python **
 
@@ -41,26 +41,26 @@ Interface that has not started or developed very little:
 ## Approximate interface display:
 ### pc 端:
 
-- Login:![Login](img/login_0.png?raw=true)
-![login](img/login_1.png?raw=true)
-- Main interface:![Main](img/main_0.png?raw=true)
-- Sidebar:![Sidebar](img/sidebar_0.png?raw=true)
-- Recommended playlist:![Rec_musiclist](img/rec_musiclist.png?raw=true)
-![rec_musiclist](img/rec_musiclist_1.png?raw=true)
-- Song detail page:![Music_detail](img/music_detail.png?raw=true)
-![music_detail](img/music_detail_1.png?raw=true)
-- Playlist detail page:![Musiclist_detail](img/music_list.png?raw=true)
-- Search interface:![Search](img/search.png?raw=true)
-- Night mode:![Night](img/night_rec_musiclist.png?raw=true)
-![night](img/night_main.png?raw=true)
+- Login:<img src="img/login_0.png" height="5%" />
+<img src="img/login_1.png" height="5%" />
+- Main interface:<img src="img/main_0.png" height="5%" />
+- Sidebar:<img src="img/sidebar_0.png" height="5%" />
+- Recommended playlist:<img src="img/rec_musiclist.png" height="5%" />
+<img src="img/rec_musiclist_1.png" height="5%" />
+- Song detail page:<img src="img/music_detail.png" height="5%" />
+<img src="img/music_detail_1.png" height="5%" />
+- Playlist detail page:<img src="img/music_list.png" height="5%" />
+- Search interface:<img src="img/search.png" height="5%" />
+- Night mode:<img src="img/night_rec_musiclist.png" height="5%" />
+<img src="img/night_main.png" height="5%" />
 
 ### Android side:
-- Login:![Login](img/a_login.png?raw=true)
-- Main interface:![Main](img/a_main.png?raw=true)
-- Sidebar:![Sidebar](img/a_side.png?raw=true)
-- Recommended playlist:![Rec_musiclist](img/a_rec_m_l.png?raw=true)
-- Song detail page:![Music_detail](img/a_music_detail.png?raw=true)
-- Playlist detail page:![Musiclist_detail](img/a_musiclist_detail.png?raw=true)
-- Search interface:![Search](img/a_search.png?raw=true)
+- Login:<img src="img/a_login.png" height="5%" />
+- Main interface:<img src="img/a_main.png" height="5%" />
+- Sidebar:<img src="img/a_side.png" height="5%" />
+- Recommended playlist:<img src="img/a_rec_m_l.png" height="5%" />
+- Song detail page:<img src="img/a_music_detail.png" height="5%" />
+- Playlist detail page:<img src="img/a_musiclist_detail.png" height="5%" />
+- Search interface:<img src="img/a_search.png" height="5%" />
 ## Open source license:
 - This project is released under the Apache-2.0 agreement, please refer to the license file
