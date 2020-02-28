@@ -55,12 +55,12 @@ Interface that has not started or developed very little:
 <img src="img/night_main.png" style="zoom:50%" />
 
 ### Android side:
-- Login:<img src="img/a_login.png" style="zoom:50%" />
-- Main interface:<img src="img/a_main.png" style="zoom:50%" />
-- Sidebar:<img src="img/a_side.png" style="zoom:50%" />
-- Recommended playlist:<img src="img/a_rec_m_l.png" style="zoom:50%" />
-- Song detail page:<img src="img/a_music_detail.png" style="zoom:50%" />
-- Playlist detail page:<img src="img/a_musiclist_detail.png" style="zoom:50%" />
-- Search interface:<img src="img/a_search.png" style="zoom:50%" />
+- Login:<img src="img/a_login.png"  width = "50%" />
+- Main interface:<img src="img/a_main.png" width = "50%" />
+- Sidebar:<img src="img/a_side.png" width = "50%" />
+- Recommended playlist:<img src="img/a_rec_m_l.png" width = "50%" />
+- Song detail page:<img src="img/a_music_detail.png" width = "50%" />
+- Playlist detail page:<img src="img/a_musiclist_detail.png" width = "50%" />
+- Search interface:<img src="img/a_search.png" width = "50%" />
 ## Open source license:
 - This project is released under the Apache-2.0 agreement, please refer to the license file
