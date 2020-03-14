@@ -84,7 +84,7 @@ if is_android:
                 request_permissions([p], callback=callbk)
     except Exception as e:
         Logger.info(str(e))
-
+    
 
 class Block(Factory.Widget):
     block_lock=Factory.ListProperty([True,True,True])
@@ -101,12 +101,35 @@ class Block(Factory.Widget):
         super(Block, self).on_touch_move(touch)
         return self.block_lock[2]
 
+
 class NetEaseApp(App):
+    system_config=Factory.DictProperty({'theme':0})
+    theme_color=Factory.ListProperty()
+    
+    night_mode_on=Factory.BooleanProperty(False)
+    bg_color=Factory.ListProperty()
+    bg_color_0=Factory.ListProperty()
+    bg_color_1=Factory.ListProperty()
+    bg_color_2=Factory.ListProperty()
+    
+    def on_system_config(self,instance,value):
+        self.theme_color=self.theme[self.system_config['theme']]['common']
+
+    def on_night_mode_on(self, instance, value):
+        self.bg_color = [.56]*3 if value else [1]*3
+        self.bg_color_0=list(map(lambda x: x*.97, self.bg_color))
+        self.bg_color_1=list(map(lambda x: x*.90, self.bg_color))
+        self.bg_color_2=list(map(lambda x: x*.70, self.bg_color))
+
     def __init__(self, debug_mood=False):
         super(NetEaseApp, self).__init__()
         self.init_kivy_conf()
         
         self.distribute_source_file_name()
+
+        self.on_night_mode_on(0,self.night_mode_on)
+        self.on_system_config(0,self.system_config)
+        
         self.load_user_info()
         
         Window.bind(on_keyboard=self.touch_on_android_button)
@@ -224,10 +247,8 @@ class NetEaseApp(App):
             default_config={'theme': 'green'}
             File.save_to_json(default_config, self.system_config_path)
             self.system_config=default_config
-
         else:
             self.system_config=File.load_from_json(self.system_config_path)
-        
 
     def load_user_info(self,):
         self.spider=api.NetEase()
@@ -260,17 +281,9 @@ class NetEaseApp(App):
         if getattr(self,'playbar',None):
             self.playbar.size_hint_y=0
 
-    def night_mood(self):
-        color=self.colors['white'] if self.night else C('#8f8f8f')
-        
-        self.root.bg_color=color
-
-        self.night=not self.night
-
     def change_theme(self, theme_name):
         if self.system_config['theme'] != theme_name:
             theme_color=self.theme[theme_name]['common']
-            self.root.theme_color=theme_color
             
             self.system_config['theme']=theme_name
             File.save_to_json(self.system_config, self.system_config_path)
@@ -448,7 +461,7 @@ class NetEaseApp(App):
         collected_pl=[]
 
         for pl in playlist:
-            # find the user's favorite musiclist id
+            # search the user's favorite musiclist id
             if pl['name']== self.nickname+'喜欢的音乐': self.favotie_music_list_id=pl['id']
             
             if pl['classify']==0:created_pl.append(pl)
@@ -458,8 +471,6 @@ class NetEaseApp(App):
         self._update_user_playlist(playlist)
 
     def _update_user_playlist(self, playlist):
-        self.clear_glayout('created')
-        self.clear_glayout('collected')
 
         created_pl,collected_pl=playlist
         
@@ -472,14 +483,14 @@ class NetEaseApp(App):
             layout.t0=re.sub('\d+',str(len(collected_pl)),layout.t0)
 
         f()
-        myThread(self.add_single_playlist,
-                 list(zip(created_pl, ['created']*len(created_pl))), dont_join=1)
+        self.set_all_user_pl_data(created_pl,'created_m_l_m')
+        self.set_all_user_pl_data(collected_pl,'collected_m_l_m')
         
-        myThread(self.add_single_playlist,
-                 list(zip(collected_pl, ['collected']*len(collected_pl))), dont_join=1)
-        
-
-    def add_single_playlist(self, playlist, parent, type_=0):
+    @mainthread
+    def set_all_user_pl_data(self,playlist,parent,type_=0):
+        self.root.ids[parent].content_data= [self.get_single_user_pl_data(pl,type_=type_) for pl in playlist]
+    
+    def get_single_user_pl_data(self, playlist, type_=0):
         id_,img,name,creator= [playlist[x] for x in ['id','coverImgUrl','name','creator']]
         
         if type_==0:t1='0首 by %s'%creator
@@ -489,9 +500,10 @@ class NetEaseApp(App):
         if not os.path.exists(img_fn):self.download_resource(img,img_fn)
 
         if type_==0:
-            self.add_layout(0,parent,t0=name,t1=t1,i0=img_fn, playlist_id=id_)
+            info_dict={'t0':name, 't1':t1, 'i0':img_fn, 'playlist_id':id_}
         elif type_==1:
-            self.add_layout(2,parent,s0=img_fn,t0=name,playlist_id=str(id_))
+            info_dict={'s0':img_fn, 't0':name, 'playlist_id':str(id_)}
+        return info_dict
 
     def parse_songs(self, songs):
         for s in songs:
@@ -927,26 +939,7 @@ class NetEaseApp(App):
         rec_pl=[self.parse_single_playlist(pl) for pl in self.spider.recommend_resource()]
 
         layout=self.root.ids['recommand_m_l']
-        
-        pre_pl_ids=[c.playlist_id for c in layout.children if type(c)==Factory.RecommendPlaylist]
-        new_pl_ids=[pl['id'] for pl in rec_pl]
-
-        
-        will_remove=[]
-        for l in (l for l in layout.children \
-                  if type(l)==Factory.RecommendPlaylist and l.playlist_id not in new_pl_ids):
-            will_remove.append(l)
-            pre_pl_ids.remove(l.playlist_id)
-
-        @mainthread
-        def f():
-            for l in will_remove:
-                layout.remove_widget(l)
-        f()
-
-        for pl in rec_pl:
-            if pl['id'] not in pre_pl_ids:
-                self.add_single_playlist(pl,'recommand_m_l',type_=1)
+        self.set_all_user_pl_data(rec_pl, 'recommand_m_l', type_=1)
 
     def delete_music(self, song_widget):
         d_info=song_widget.d_info
@@ -963,6 +956,12 @@ class NetEaseApp(App):
     
     def touch_on_layout(self, args, do_this_anyway=None, other_params=None):
         instance, value = args
+##        if not value.grab_current is instance:
+##            pass
+##            print('Gun')
+##            return
+        value.ungrab(instance)
+        
         if do_this_anyway or instance.collide_point(*value.pos):
             idd=instance.idd if not do_this_anyway else do_this_anyway
             
@@ -1070,7 +1069,7 @@ class NetEaseApp(App):
                 self.change_theme(self.next_elem(self.system_config['theme'], list(self.theme.keys())))
 
             elif idd=='night':
-                self.night_mood()
+                self.night_mode_on = not self.night_mode_on
 
             elif idd=='setting':
                 layout=self.root.ids.sidebar_left_label
@@ -1086,6 +1085,9 @@ class NetEaseApp(App):
                 else:
                     myThread(self.switch_to_music_list,[instance.playlist_id],dont_join=1)
 
+            elif idd=='pl_manager':
+                instance.opened=not instance.opened
+            
             elif idd=='created_m_l_m':
                 layout=self.root.ids.created
                 
@@ -1197,7 +1199,14 @@ class NetEaseApp(App):
             elif idd=='debug':
                 breakpoint()
                 
-            return True
+##            return True
+
+    def grab_or_not(self,args):
+        instance, value = args
+        if hasattr(instance,'idd') and instance.collide_point(*value.pos):
+            value.grab(instance)
+            instance.c_a_a=.2
+##            print('Grab')
 
     def touch_scrllview(self, args, touch_on=True):
         instance, value = args
@@ -1265,7 +1274,7 @@ class NetEaseApp(App):
                 for x in range(layout_index):
                     layout=self.root.ids[layout_list[x]]
                     layout.width=0
-            else:layout_index=self.root.ids.w_u_l.index
+            else:layout_index=self.root.ids.w_u_l.index_
                 
             layout=self.root.ids[layout_list[layout_index]]
             layout.width=self.root.width
@@ -1276,7 +1285,7 @@ class NetEaseApp(App):
 
     def move_mark_line(self,pos_index):
         l=self.root.ids.w_u_l
-        l.index=pos_index
+        l.index_=pos_index
 
 
 if __name__ == '__main__':
@@ -1289,7 +1298,7 @@ if __name__ == '__main__':
     
     
     if kivy.platform != 'linux':
-        # remove all breakpoints even if i forgot it,  ( ~>-<~ )
+        # remove all breakpoints even if i forgot them,  ( ~>-<~ )
         breakpoint=lambda:None
         
 ##    else:

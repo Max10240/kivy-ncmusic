@@ -12,16 +12,28 @@
 <Widget>:
     font_name: 'kai'
     text_language: 'zh_CN'
+##    on_touch_down: app.grab_or_not(args)
+##    c_a_a: 0
+##    canvas.after:
+##        Color:
+##            rgba: [0]*3+[self.c_a_a]
+##        Rectangle:
+##            pos: self.pos
+##            size: self.size
+    
 
 <BlockImage@Image+Block>:
 
 <BlockGridLayout@GridLayout+Block>:
 
 <ColoredGridLayout@GridLayout>:
-    c0: []
+    c0: app.theme_color
+    force_set: False
+    reset_c0: []
+    
     canvas.before:
         Color:
-            rgb: self.c0 or common
+            rgb: self.reset_c0 if self.reset_c0 else (self.c0 or common)
         Rectangle:
             pos: self.pos
             size: self.size
@@ -29,7 +41,7 @@
 <BlockColoredGridLayout@ColoredGridLayout+Block>:
     
 <ColoredFloatLayout@FloatLayout>:
-    c0: []
+    c0: app.theme_color
     canvas.before:
         Color:
             rgb: self.c0 or common
@@ -37,7 +49,7 @@
             pos: self.pos
             size: self.size
 
-<ScrollView>:
+<ScrollView@Block>:
     c0: [1]*3
     scroll_timeout: 30000
     scroll_distance: 1
@@ -46,6 +58,8 @@
     do_scroll_x: False
     on_scroll_start: app.touch_scrllview(args, touch_on=True)
     on_scroll_stop: app.touch_scrllview(args, touch_on=False)
+##    dont_check_children: hasattr(self,'viewclass')
+    
     
 <LeftLabel@Label>:
     color: C('#101010')
@@ -88,10 +102,16 @@
     padding: [10, 0.5 * (self.height - self.line_height)]
     text_language: 'zh_CN'
 
+<SpecialRecycleView@GridLayout>:
+    viewclass: ''
+    data: []
+    data_bak: []
+    size_hint_y: None
+    on_data: app.special_rv_data_changed(args)
+    
 <ToolGLayout@GridLayout>:
     t0: '?'
     i0: 'src/favorite.png'
-    c0: ()
     cols: 1
     GridLayout:
         rows: 1
@@ -103,7 +123,7 @@
             size_hint_x: None
             width: self.height*.9
             source: self.parent.parent.i0
-            color: (self.parent.parent.c0 or common)+[1, ]
+            color: (app.theme_color or common)+[1, ]
 
         Label:
             size_hint_x: None
@@ -131,7 +151,7 @@
     rows: 1
     c1: []
 
-    playlist_id: None
+    playlist_id: ''
     t0: '1'
     t1: '0首 by Lua'
     i0: 'src/logo.jpg'
@@ -161,21 +181,51 @@
         idd: 'point'
         size_hint_x: None
         width: self.height*.7
-        color: (getattr(root, 'theme_color', None) or dark_gray)+[1]
+        color: app.bg_color_1
         source: 'src/point.png'
 
+<PlaylistsRecycleView@RecycleView>:
+    viewclass: 'PlaylistGlayout'
+    data: []
+    size_hint_y: None
+    height:0
+    content_default_size: [None, app.height*.1]
+    is_ugly_rv: True
+##    on_touch_down: self.parent.on_touch_down(args[1]);print(self.parent)
+##    on_touch_up: self.parent.on_touch_up(args[1])
+##    on_touch_move: self.parent.on_touch_move(args[1])
+    
+    RecycleGridLayout:
+        canvas.before:
+            Color:
+                rgb: app.bg_color
+            Rectangle:
+                size: self.size
+                pos: self.pos
+                
+        cols: 1
+        default_size: self.parent.content_default_size
+        default_size_hint: 1, None
+        size_hint_y: None
+        height: self.minimum_height
+        on_height: self.parent.height=self.height
 
 <PlaylistManager@ColoredGridLayout>:
-    c0: dark_gray
+    idd: 'pl_manager'
+    reset_c0: app.bg_color_1
     t0: 'S(0)'
     opened: False
+    content_data:[]
+    on_content_data: self.opened=True
     on_touch_up: app.touch_on_layout(args)
-    rows: 1
+    cols: 1
     size_hint_y: None
-    height: app.height*.04
+    height: self.minimum_height
     
     GridLayout:
         rows: 1
+        size_hint_y: None
+        height: app.height*.04
         GridLayout:
             rows: 1
             Image:
@@ -193,6 +243,10 @@
         Image:
             pos: self.parent.pos[0]+self.parent.width*.88, self.pos[1]
             source: 'src/setting.png'
+            
+    PlaylistsRecycleView:
+        data: self.parent.content_data
+        content_default_size: [None, app.height*.1] if self.parent.opened else [None, 0]
 
 <SingleMusicGlayout@GridLayout>:
     rows: 1
@@ -213,11 +267,7 @@
 
     GridLayout:
         cols: 1
-##        size_hint_x: None
-##        width: self.minimum_width
-##        Label:
-##            shorten: True
-            
+
         ShortenLabel:
             size_hint_y:2
             text: self.parent.parent.t0
@@ -225,7 +275,6 @@
         ShortenLabel:
             color: C(hex_light_black)
             text: self.parent.parent.t1
-##    Label:
 
     Image:
         idd: 'show_song_bubble'
@@ -243,8 +292,8 @@
     idd: 'music_list'
     on_touch_up: app.touch_on_layout(args)
     
-    s0: '1'
-    t0: '1'
+    s0: ''
+    t0: ''
     playlist_id: '0000'
     
     Image:
@@ -256,11 +305,48 @@
     Label:
         color: C('#000000')
         size_hint_y: None
-        shorten: True
-        text_size: [self.width,None]
-        height: self.font_size*2
+        valign: 'top'
+        text_size: self.size
+        height: self.font_size*2.7
         font_size: app.font_size*.7
         text: self.parent.t0
+
+<RecPlRecycleView@RecycleView>:
+    viewclass: 'RecommendPlaylist'
+    data: []
+    size_hint_y: None
+    height:0
+    content_default_size: [None, app.height*.4]
+    is_ugly_rv: True
+    
+    RecycleGridLayout:
+        canvas.before:
+            Color:
+                rgb: app.bg_color
+            Rectangle:
+                size: self.size
+                pos: self.pos
+                
+        cols: 3
+        default_size: self.parent.content_default_size
+        default_size_hint: 1, None
+        size_hint_y: None
+        height: self.minimum_height
+        on_height: self.parent.height=self.height
+
+<RecommendPLManager@GridLayout>:
+    cols: 1
+    size_hint_y: None
+    height: self.minimum_height
+    content_data:[]
+    
+    LeftLabel:
+        size_hint_y: None
+        height: self.font_size*1.2
+        text: '推荐歌单 >'
+
+    RecPlRecycleView:
+        data: self.parent.content_data
 
 <SideBarBox@GridLayout>:
     idd: ''
@@ -355,11 +441,6 @@
         on_press: app.delete_music(self.parent.parent.selected_widget)
 
 ScreenManager:
-    theme_color: app.theme[app.system_config['theme']]['common']
-    bg_color: app.colors['white']
-    light_bg_color_99: list(map(lambda x: x*.97, self.bg_color))
-    light_bg_color_90: list(map(lambda x: x*.90, self.bg_color))
-    light_bg_color_70: list(map(lambda x: x*.70, self.bg_color))
     is_playing: False
 
     on_height: app.set_playbar_height_to_zero()
@@ -368,12 +449,11 @@ ScreenManager:
         name: 'home'
 
         ColoredGridLayout:
-            c0: root.bg_color
+            reset_c0: app.bg_color
             
             id: home_root
             cols: 1
             ColoredGridLayout:
-                c0: root.theme_color
                 cols: 1
                 size_hint_y: .4
                 id:common_box
@@ -427,7 +507,6 @@ ScreenManager:
                 cols: 1
 
                 ColoredGridLayout:
-                    c0: root.theme_color
                     id: red_space
                     cols: 1
                     size_hint: None,None
@@ -458,12 +537,11 @@ ScreenManager:
                                 rows: 1
                                 size_hint: 1,None
                                 height: root.height*.10
-                                c0: root.theme_color
-                                c1: root.light_bg_color_99
+                                c1: app.bg_color_0
                                 
                                 canvas.before:
                                     Color:
-                                        rgb: self.c0 or common
+                                        rgb: app.theme_color or common
                                     Rectangle:
                                         size: self.width,self.height*.5
                                         pos: self.pos[0], self.center[1] 
@@ -511,20 +589,19 @@ ScreenManager:
                                 GridLayout:
                                     cols: 1
                                     id: vip_round
-                                    c0: root.theme_color
                                     size_hint_x: None
                                     width: app.font_size*5
                                     
                                     canvas.before:
                                         Color:
-                                            rgb: self.c0 or common
+                                            rgb: app.theme_color or common
                                         Line:
                                             width: 1.01
                                             rounded_rectangle: (self.center[0]-app.font_size*2.5,self.center[1]-app.font_size*.6,app.font_size*5,app.font_size*1.2,app.font_size*.6,app.font_size*.6,app.font_size*.6,app.font_size*.6,100)
                                         
                                     Label:
                                         id: vip
-                                        color: (root.theme_color or common)+[1,]
+                                        color: app.theme_color+[1,]
                                         font_size: app.font_size
                                         size_hint: (1, None)
                                         height: self.parent.height
@@ -542,65 +619,38 @@ ScreenManager:
                                 height: root.height*.4
                                 
                                 ToolGLayout:
-                                    c0: root.theme_color
                                     idd: 'local_music'
                                     on_touch_up: app.touch_on_layout(args)
                                     i0: 'src/music.png'
                                     t0: '本地音乐'
 
                                 ToolGLayout:
-                                    c0: root.theme_color
                                     i0: 'src/nearly_play.png'
                                     t0: '最近播放'
                                  
                                 ToolGLayout:
-                                    c0: root.theme_color
                                     i0: 'src/download_manager.png'
                                     t0: '下载管理'
 
                                 ToolGLayout:
-                                    c0: root.theme_color
                                     i0: 'src/my_fm.png'
                                     t0: '我的电台'
                                  
                                 ToolGLayout:
-                                    c0: root.theme_color
                                     i0: 'src/favorite.png'
                                     t0: '我的收藏'
 
                                 ToolGLayout:
-                                    c0: root.theme_color
                                     i0: 'src/sati.png'
                                     t0: 'Sati空间'
 
                             PlaylistManager:
-                                c0: root.light_bg_color_90
                                 id: created_m_l_m
-                                idd: 'created_m_l_m'
                                 t0: '创建的歌单(0)'
 
-                            GridLayout:
-                                id: created
-                                size_hint_y: None
-                                height: self.minimum_height
-                                on_children: created_m_l_m.opened=1
-                                cols: 1
-                                
                             PlaylistManager:
-                                c0: root.light_bg_color_90
                                 id: collected_m_l_m
-                                idd: 'collected_m_l_m'
                                 t0: '收藏的歌单(0)'
-
-                            GridLayout:
-                                id: collected
-                                size_hint_y: None
-                                height: self.minimum_height
-                                on_children: collected_m_l_m.opened=1
-                                cols: 1
-
-                                PlaylistGlayout:
-                                    height:0
 
                     GridLayout:
                         id: second_page_glayout
@@ -610,7 +660,6 @@ ScreenManager:
                         f_s: app.font_size if self.width else 0
                         
                         ColoredGridLayout:
-                            c0: root.theme_color
                             rows: 1
                             id: box_rec_mark
                             size_hint: None,None
@@ -638,22 +687,32 @@ ScreenManager:
                                 id: radio
                                 idd: 'radio'
                                 on_touch_up: app.touch_on_layout(args)
-                            
-                        ColoredFloatLayout:
-                            c0: root.theme_color
-                            size_hint: None,None
-                            height: 5
-                            width: self.parent.width
-                            id: white_under_line
-                            Label:
-                                index: 0
-                                font_size: self.parent.parent.f_s
-                                pos_hint: {'center_x': [1/6, .5, 5/6][self.index], 'center_y': 1}
-                                id: w_u_l
-                                valign: 'top'
-                                text: '----'
 
+                        ColoredGridLayout:
+                            rows: 1
+                            size_hint: None,None
+                            height: self.minimum_height
+                            width: self.parent.width
                             
+                            id: w_u_l
+                            index_: 0
+                            flag: '----' if self.width else ''
+                            Label:
+                                size_hint_y: None
+                                height: self.font_size*.7
+                                font_size: app.font_size
+                                text: self.parent.flag if self.parent.index_==0 else ''
+                            Label:
+                                size_hint_y: None
+                                height: self.font_size*.7
+                                font_size: app.font_size
+                                text: self.parent.flag if self.parent.index_==1 else ''
+                            Label:
+                                size_hint_y: None
+                                height: self.font_size*.7
+                                font_size: app.font_size
+                                text: self.parent.flag if self.parent.index_==2 else ''
+
                         GridLayout:
                             id: scroll_glayout
                             cols: 3
@@ -677,13 +736,12 @@ ScreenManager:
                                     GridLayout:
                                         cols: 1
                                         size_hint: 1,None
-                                        c0: root.theme_color
                                         height: root.width*.33
                                         id: space_red
                                         
                                         canvas.before:
                                             Color:
-                                                rgb: self.c0 or common
+                                                rgb: app.theme_color or common
                                             Rectangle:
                                                 size: self.width,self.height*.7
                                                 pos: self.pos[0], self.pos[1]+self.height*.3
@@ -710,10 +768,9 @@ ScreenManager:
                                         size_hint_y: None
                                         height: root.height*.1
                                         id: box_pic_fm
-                                        c0: root.theme_color
                                         canvas.before:
                                             Color:
-                                                rgb: self.c0 or common
+                                                rgb: app.theme_color or common
                                                 
                                             Ellipse:
                                                 pos: self.pos[0]+self.width/8-self.height*.8/2, self.pos[1]
@@ -792,22 +849,9 @@ ScreenManager:
                                         size_hint_y: None
                                         text:''
                                         height:root.height*.07
-                                        
-                                    GridLayout:
+
+                                    RecommendPLManager:
                                         id: recommand_m_l
-                                        cols: 3
-                                        size_hint_y: None
-                                        height: self.minimum_height
-
-                                        LeftLabel:
-                                            pos_hint: {'center_x':.5, 'center_y': .3}
-                                            text: '推荐歌单 >'
-                                            
-                                        Label:
-
-                                        Label:
-
-                                        RecommendPlaylist:
 
                             ScrollView:
                                 id: second_page_2_s
@@ -873,7 +917,25 @@ ScreenManager:
                                         halign: 'left'
                                         markup: True
                                         
-                                        text: '...'
+                                        text: '...\n'*100
+
+                            GridLayout:
+                                cols: 1
+                                size_hint: None,None
+                                width: root.width
+                                height: root.height*1
+                                Label:
+                                    size_hint_y: None
+                                    font_size: app.font_size
+                                    line_height: 2
+                                    color: common+[.8,]
+                                    text_size: self.size[0], None
+                                    height: self.texture_size[1]
+                                    halign: 'left'
+                                    markup: True
+                                    
+                                    text: '1\n'*100
+                                
                         
 ##                            LeftLabel:
 ##                                id: video_label
@@ -903,13 +965,10 @@ ScreenManager:
                             size_hint: None,None
                             raised: False
                             size: root.size
-##                            width: root.width
-##                            height: root.height
-##                            pos_hint: {}
                             pos: -root.size[0],0
 
                             ColoredGridLayout:
-                                c0: root.bg_color
+                                reset_c0: app.bg_color
                                 id: sidebar_visiable
                                 size_hint: 5,1
                                 cols: 1
@@ -1045,7 +1104,7 @@ ScreenManager:
 
                                             ColoredGridLayout:
                                                 cols: 1
-                                                c0: root.light_bg_color_90 or dark_gray
+                                                reset_c0: app.bg_color_1 or dark_gray
                                                 size_hint_y:None
                                                 height: root.height/50
 
@@ -1126,13 +1185,13 @@ ScreenManager:
                                 on_touch_up:app.touch_on_layout(args)
 
         ColoredGridLayout:
-            c0: root.bg_color
+            reset_c0: app.bg_color
             id: playbar
             loop_status: app.loop_status
             cols: 1
             size_hint: 1,0
             height: 0 
-            c1: root.theme_color
+            c1: app.theme_color
 
             Label:
                 size_hint_y: .1
@@ -1210,10 +1269,9 @@ ScreenManager:
         current_playlist: []
         
         ColoredGridLayout:
-            c0: root.bg_color
+            reset_c0: app.bg_color
             cols: 1
             ColoredGridLayout:
-                c0: root.theme_color
                 rows: 1
                 size_hint_y: None
                 height: root.width*.1
@@ -1245,7 +1303,6 @@ ScreenManager:
                         source: 'src/search.png'
                         
             ColoredGridLayout:
-                c0: root.theme_color
                 rows: 1
                 size_hint_y: None
                 height: root.height*.05
@@ -1279,7 +1336,7 @@ ScreenManager:
                         idd: 'play_all_songs'
                         on_touch_up: app.touch_on_layout(args)
                         source: 'src/pausing.png'
-                        color: root.theme_color+[1]
+                        color: app.theme_color+[1]
                         size_hint_x: None
                         width: self.height
 
@@ -1302,7 +1359,7 @@ ScreenManager:
     Screen:
         name: 'login'
         ColoredGridLayout:
-            c0: root.bg_color
+            reset_c0: app.bg_color
             cols: 1
 
             Label:
@@ -1332,7 +1389,7 @@ ScreenManager:
 
             GridLayout:
                 cols: 1
-                c0: root.light_bg_color_90 or common
+                c0: app.bg_color_1 or common
                 size_hint: None, None
                 width: root.width*.8
                 height: self.minimum_height
@@ -1364,7 +1421,7 @@ ScreenManager:
 
             GridLayout:
                 cols: 1
-                c0: root.light_bg_color_90 or common
+                c0: app.bg_color_1 or common
                 size_hint: None, None
                 width: root.width*.8
                 height: self.minimum_height
@@ -1404,7 +1461,7 @@ ScreenManager:
                 loginEnable: False
                 canvas.before:
                     Color:
-                        rgb: (root.light_bg_color_90 or dark_gray)if not self.loginEnable else (root.theme_color or common)
+                        rgb: (app.bg_color_1 or dark_gray) if not self.loginEnable else app.theme_color
 
                     Ellipse:
                         size: self.size
@@ -1433,7 +1490,7 @@ ScreenManager:
         current_playlist: []
         
         ColoredGridLayout:
-            c0: root.bg_color
+            reset_c0: app.bg_color
             cols: 1
             
             GridLayout:
@@ -1525,7 +1582,7 @@ ScreenManager:
                 Image:
                     size_hint_x: None
                     width: self.height
-                    color: root.theme_color+[1]
+                    color: app.theme_color+[1]
                     source: 'src/pausing.png'
                     
                 FixedHeightLeftLabel:
@@ -1541,7 +1598,7 @@ ScreenManager:
 
         ColoredGridLayout:
             cols: 1
-            c0: root.light_bg_color_70
+            reset_c0: app.bg_color_2
 
             GridLayout:
                 rows: 1
@@ -1554,7 +1611,7 @@ ScreenManager:
                     size_hint_x: None
                     width: self.height*.8
                     allow_stretch: True
-                    color: (root.theme_color or common)+[1,]
+                    color: app.theme_color+[1,]
                     source: 'src/arrow_left.png'
                 Label:
                     size_hint_x: None
@@ -1583,7 +1640,7 @@ ScreenManager:
                         size_hint_y: None
                         font_size: app.font_size
                         line_height: 2
-                        color: [0]*3+[1]#(root.theme_color or common)+[1]
+                        color: [0]*3+[1]
                         text_size: self.size[0], None
                         height: self.texture_size[1]
                         halign: 'center'
@@ -1598,7 +1655,7 @@ ScreenManager:
                     id: current_time
                     size_hint_x: None
                     width: root.width*.1
-                    color: root.bg_color+[1]
+                    color: app.bg_color+[1]
                     text: app.format_time(play_slider.value_normalized * getattr(app,'current_song_length',0))
 
                 Slider:
@@ -1609,14 +1666,14 @@ ScreenManager:
                     on_lock: self.cursor_size= [self.cursor_size[0]*2]*2 if self.lock else [self.cursor_size[0]*.5]*2
                     on_touch_down: app.touch_on_layout(args, False, 'on')
                     on_touch_up: app.touch_on_layout(args, 'play_slider', 'up')
-                    value_track_color: root.theme_color+[1]
+                    value_track_color: app.theme_color+[1]
                     cursor_image: 'src/curcor.png'
                     
                 Label:
                     id: song_length
                     size_hint_x: None
                     width: root.width*.1
-                    color: root.light_bg_color_90+[1]
+                    color: app.bg_color_1+[1]
                     text: 'TotalTime'
 
             GridLayout:
@@ -1649,12 +1706,10 @@ ScreenManager:
                 AnchorLayout:
                     anchor_x: 'center'
                     anchor_y: 'center'
-##                    idd: 'debug'
-##                    on_touch_down: app.touch_on_layout(args)
                     Image:
                         idd: 'play_or_stop'
 ##                        allow_stretch: True
-                        color: (root.theme_color or common)+[1]
+                        color: app.theme_color+[1]
                         on_touch_up: app.touch_on_layout(args)
                         source: 'src/playing.png' if root.is_playing else 'src/pausing.png'
                         
